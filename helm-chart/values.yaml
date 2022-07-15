@@ -1,0 +1,185 @@
+# Default values for xinlus.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  # repository: nginx
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  # tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+# fsGroup: 2000
+volumesContext: []
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations:
+  # kubernetes.io/ingress.class: nginx
+  # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: "localhost"
+      paths:
+        - path: "/nacos"
+          pathType: ImplementationSpecific
+          serviceName: "nacos"
+
+  tls: []
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+registerServer: "nacos"
+
+springcloud:
+  nacos:
+    image:
+      repository: "xinlusdocker/nacos"
+    containerPort: 8848
+    environments:
+      - name: MODE
+        value: "standalone"
+      - name: PREFER_HOST_MODE
+        value: "nacos"
+      - name: SPRING_DATASOURCE_PLATFORM
+        value: "mysql"
+      - name: MYSQL_SERVICE_HOST
+        value: "localhost"
+      - name: MYSQL_SERVICE_PORT
+        value: "3306"
+      - name: MYSQL_SERVICE_USER
+        value: "root"
+      - name: MYSQL_SERVICE_PASSWORD
+        value: "root"
+      - name: MYSQL_SERVICE_DB_NAME
+        value: "nacos"
+    injectNacosEnv: true
+    resourcesType: normal
+
+microService:
+  seata-server:
+    image:
+      repository: "xinlusdocker/seata-server"
+    containerPort: 8091
+    injectNacosEnv: true
+    resourcesType: normal
+  gateway:
+    replicaCount: 1
+    image:
+      repository: "xinlusdocker/gateway"
+    containerPort: 8081
+    servicePort: 8082
+    environments:
+      - name: ENV
+        value: "dev"
+    injectNacosEnv: true
+    resourcesType: normal
+  bound-point:
+    replicaCount: 1
+    image:
+      repository: "xinlusdocker/bound-point"
+    containerPort: 8092
+    servicePort: 8092
+    environments:
+      - name: ENV
+        value: "dev"
+    injectNacosEnv: true
+    resourcesType: normal
+  purchase-order:
+    replicaCount: 1
+    image:
+      repository: "xinlusdocker/purchase-order"
+    containerPort: 8082
+    servicePort: 8082
+    environments:
+      - name: ENV
+        value: "dev"
+    injectNacosEnv: true
+    resourcesType: normal
+
+cronjob:
+  #      ┌────────────────── timezone (optional)
+  #      |      ┌───────────── minute (0 - 59)
+  #      |      │ ┌───────────── hour (0 - 23)
+  #      |      │ │ ┌───────────── day of the month (1 - 31)
+  #      |      │ │ │ ┌───────────── month (1 - 12)
+  #      |      │ │ │ │ ┌───────────── day of the week (0 - 6) (Sunday to Saturday;
+  #      |      │ │ │ │ │                                   7 is also Sunday on some systems)
+  #      |      │ │ │ │ │
+  #      |      │ │ │ │ │
+  # CRON_TZ=UTC * * * * *
+#  hello:
+#    schedule: "*/1 * * * *"
+#    tasks:
+#      - image:
+#          repository: busybox
+#          tag: 1.33.1
+#        command:
+#          - /bin/sh
+#          - -c
+#          - date; echo Hello from the Kubernetes cluster1
+#      - image:
+#          repository: busybox
+#          tag: 1.33.1
+#        command:
+#          - /bin/sh
+#          - -c
+#          - date; echo Hello from the Kubernetes cluster2
+
+resources:
+  light:
+    requests:
+      memory: "128Mi"
+      cpu: "50m"
+    limits:
+      memory: "256Mi"
+      cpu: "500m"
+  normal: &default
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "1024Mi"
+      cpu: "1000m"
+  heavy:
+    requests:
+      memory: "512Mi"
+      cpu: "100m"
+    limits:
+      memory: "1536Mi"
+      cpu: "4000m"
+  default:
+    *default

@@ -1,0 +1,3 @@
+[submodule "seata_springboot"]
+	path = seata_springboot
+	url = https://github.com/xinlus/seata-nacos-springboot-demo.git
