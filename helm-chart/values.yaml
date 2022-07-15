@@ -100,8 +100,8 @@ microService:
     replicaCount: 1
     image:
       repository: "xinlusdocker/gateway"
-    containerPort: 8081
-    servicePort: 8082
+    containerPort: 8070
+    servicePort: 8070
     environments:
       - name: ENV
         value: "dev"
@@ -111,8 +111,8 @@ microService:
     replicaCount: 1
     image:
       repository: "xinlusdocker/bound-point"
-    containerPort: 8092
-    servicePort: 8092
+    containerPort: 8081
+    servicePort: 8081
     environments:
       - name: ENV
         value: "dev"
@@ -122,8 +122,8 @@ microService:
     replicaCount: 1
     image:
       repository: "xinlusdocker/purchase-order"
-    containerPort: 8082
-    servicePort: 8082
+    containerPort: 8080
+    servicePort: 8080
     environments:
       - name: ENV
         value: "dev"
